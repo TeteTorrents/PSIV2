@@ -54,4 +54,4 @@ def detect_plate(image_path):
     return x_roi, y_roi, w_roi, h_roi 
 
 
-detect_plate("fotos_profe/PXL_20210921_094938026.jpg")
+detect_plate("fotos/cotxe1.jpg")

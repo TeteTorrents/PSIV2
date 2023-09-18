@@ -29,7 +29,7 @@ def segmentChars(roi):
 
     return letters_bboxes
 
-path_org = "fotos_profe/image_marti.jpeg"
+path_org = "fotos/cotxe1.jpeg"
 img_org = cv2.imread(path_org)
 image = cv2.resize(img_org, (1000, 800))
 x_roi, y_roi, w_roi, h_roi = (535, 449, 282, 65)
