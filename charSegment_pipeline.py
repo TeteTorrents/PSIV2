@@ -20,8 +20,8 @@ def segmentChars(roi):
     for label in range(1, totalLabels_roi):
         x, y, w, h, _ = stats_roi[label]
         if h > 15 and w > 15 and (w < roi.shape[1]/3):
-            cv2.rectangle(roi, (x, y), (x + w, y + h), (120, 0, 0), 2)
-            letters_bboxes.append((x,y,w,h))
+            cv2.rectangle(roi, (x-2, y-5), (x-2 + w+5, y-5 + h+10), (0, 255, 0), 2)
+            letters_bboxes.append((x-2,y-5,w+2,h+10))
     
     cv2.imshow('Image with Bounding Boxes', roi)
     cv2.waitKey(0)
