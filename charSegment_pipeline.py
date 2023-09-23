@@ -20,7 +20,7 @@ def segmentChars(roi):
     for label in range(1, totalLabels_roi):
         x, y, w, h, _ = stats_roi[label]
         if h > 15 and w > 15 and (w < roi.shape[1]/3):
-            cv2.rectangle(roi, (x-2, y-5), (x-2 + w+5, y-5 + h+10), (0, 255, 0), 2)
+            #cv2.rectangle(roi, (x-2, y-5), (x-2 + w+5, y-5 + h+10), (0, 255, 0), 2)
             letters_bboxes.append((x-2,y-5,w+2,h+10))
     
     cv2.imshow('Image with Bounding Boxes', roi)
@@ -28,7 +28,7 @@ def segmentChars(roi):
     cv2.destroyAllWindows()
 
     return letters_bboxes
-
+"""
 path_org = "fotos_profe/PXL_20210921_095212294.jpg"
 img_org = cv2.imread(path_org)
 image = cv2.resize(img_org, (1000, 800))
@@ -40,3 +40,4 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 segmentChars(roi)
+"""
