@@ -27,7 +27,7 @@ def detect_plate(image_path):
     open_image = cv2.morphologyEx(closed_image2, cv2.MORPH_OPEN, kernel, iterations = 1)
 
     # Binaritzem la imatge mitjançant la operació de thresholding (definim un threshold de 80)
-    _, binary_image = cv2.threshold(open_image, 80, 255, cv2.THRESH_BINARY)
+    _, binary_image = cv2.threshold(open_image, 70, 255, cv2.THRESH_BINARY)
 
     # Erosionem i dilatem per eliminar elements/soroll de la imatge binaritzada
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
@@ -54,4 +54,4 @@ def detect_plate(image_path):
     return x_roi, y_roi, w_roi, h_roi 
 
 
-detect_plate("fotos/cotxe1.jpg")
+print(detect_plate("fotos/cotxe2.jpg"))
