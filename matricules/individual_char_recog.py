@@ -75,23 +75,24 @@ def nn_recognizer(roi):
 
 def easyOCR_recognizer(roi):
     reader = easyocr.Reader(['en'])
-    return reader.readtext(roi)
+    return reader.readtext(roi)[0][1]
 
 def pytesseract_recognizer(roi):
     return pytesseract.image_to_string(roi, config='--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns xxx.patterns')
 
-image_o = cv2.imread('fotos/cotxe1.jpg')
-image_o = cv2.resize(image_o, (1000, 800))
-y,x,_ = image_o.shape
-image = image_o[int(1/3*y):, int(1/3*x):]
-x_roi, y_roi, w_roi, h_roi = (195, 166, 289, 83)
-roi = image[y_roi:y_roi+h_roi, x_roi:x_roi+w_roi]
+if __name__ == '__main__':
+    image_o = cv2.imread('fotos/cotxe6.jpg')
+    image_o = cv2.resize(image_o, (1000, 800))
+    y,x,_ = image_o.shape
+    image = image_o[int(1/3*y):, int(1/3*x):]
+    x_roi, y_roi, w_roi, h_roi = (195, 166, 289, 83)
+    roi = image[y_roi:y_roi+h_roi, x_roi:x_roi+w_roi]
 
-cv2.imshow('Image with Bounding Boxes', roi)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.imshow('Image with Bounding Boxes', roi)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-print(svm_recognizer(roi))
-print(nn_recognizer(roi))
-print(easyOCR_recognizer(roi))
-print(pytesseract_recognizer(roi))
+    print(svm_recognizer(roi))
+    print(nn_recognizer(roi))
+    print(easyOCR_recognizer(roi))
+    print(pytesseract_recognizer(roi))
