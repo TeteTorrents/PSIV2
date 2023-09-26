@@ -7,6 +7,8 @@ import torch.nn as nn
 import torchvision.models as models
 from sklearn.metrics import accuracy_score, classification_report
 from PIL import Image
+import easyocr
+import pytesseract
 
 def svm_recognizer(roi):
 
@@ -70,9 +72,15 @@ def nn_recognizer(roi):
         predicted_letter = class_names[predicted.item()]
         result.append(predicted_letter)
     return result
-    
 
-image_o = cv2.imread('fotos_profe/image_marti.jpeg')
+def easyOCR_recognizer(roi):
+    reader = easyocr.Reader(['en'])
+    return reader.readtext(roi)
+
+def pytesseract_recognizer(roi):
+    return pytesseract.image_to_string(roi, config='--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns xxx.patterns')
+
+image_o = cv2.imread('fotos/cotxe1.jpg')
 image_o = cv2.resize(image_o, (1000, 800))
 y,x,_ = image_o.shape
 image = image_o[int(1/3*y):, int(1/3*x):]
@@ -83,4 +91,7 @@ cv2.imshow('Image with Bounding Boxes', roi)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-svm_recognizer(roi)
+print(svm_recognizer(roi))
+print(nn_recognizer(roi))
+print(easyOCR_recognizer(roi))
+print(pytesseract_recognizer(roi))
