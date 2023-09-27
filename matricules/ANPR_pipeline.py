@@ -44,10 +44,10 @@ def anpr_pipeline(image_path, mode = 'Yolo'):
     # cv2.destroyAllWindows()
     return text
 
-df = pd.DataFrame(columns=['Model', 'foto','Plate'])
+df = pd.DataFrame(columns=['Model', 'foto', 'Plate'])
 types = ['SVM', 'Xarxa', 'Pytesseract','EasyOCR'] # , 'Yolo']
 
-fotos = [f"cotxe{i}.jpg" for i in range(1, 7)]
+fotos = [f"cotxe{i}.jpg" for i in range(1, 12)]
 for f in fotos:
     # print(t)
     path = os.path.join('fotos', f)

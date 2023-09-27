@@ -75,7 +75,10 @@ def nn_recognizer(roi):
 
 def easyOCR_recognizer(roi):
     reader = easyocr.Reader(['en'])
-    return reader.readtext(roi)[0][1]
+    output = reader.readtext(roi)
+    if len(output) == 0:
+        return ''
+    return output[0][1]
 
 def pytesseract_recognizer(roi):
     return pytesseract.image_to_string(roi, config='--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns xxx.patterns')
