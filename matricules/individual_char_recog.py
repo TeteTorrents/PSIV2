@@ -10,7 +10,8 @@ from PIL import Image
 import easyocr
 import pytesseract
 
-def svm_recognizer(roi):
+
+def svm_recognizer(roi_ge, roi):
 
     # Load models:
     with open('svm_model_numbers.pkl', 'rb') as model_file:
@@ -19,7 +20,7 @@ def svm_recognizer(roi):
     with open('svm_model_letters.pkl', 'rb') as model_file:
         svm_model_letters = pickle.load(model_file)
 
-    bboxes = segmentChars(roi)
+    bboxes = segmentChars(roi_ge, roi)
     bboxes_sorted = sorted(bboxes, key=lambda x: x[0])
     result = []
 
@@ -35,7 +36,7 @@ def svm_recognizer(roi):
     
     return result
 
-def nn_recognizer(roi):
+def nn_recognizer(roi_ge, roi):
     loaded_model = models.resnet18(pretrained=True)
     loaded_model.fc = nn.Sequential(
         nn.Linear(loaded_model.fc.in_features, 512),
@@ -52,7 +53,7 @@ def nn_recognizer(roi):
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    bboxes = segmentChars(roi)
+    bboxes = segmentChars(roi_ge, roi)
     bboxes_sorted = sorted(bboxes, key=lambda x: x[0])
     result = []
 

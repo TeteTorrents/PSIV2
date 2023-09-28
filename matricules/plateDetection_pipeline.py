@@ -17,7 +17,7 @@ def detect_plate(image_path):
     gray_equalized = cv2.equalizeHist(gray)
 
     #Fem otsu
-    ret_val, otsu_binary = cv2.threshold(gray_equalized, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    #ret_val, otsu_binary = cv2.threshold(gray_equalized, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
     # Fem un closing -> dilatar + erosionar
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
@@ -60,17 +60,21 @@ def detect_plate(image_path):
     for label in range(1, totalLabels):
         x, y, w, h, _ = stats[label]
         if cnt_rat > 1:
-            if 2.5 <= w/h <= 6 and w < image.shape[0]/1.5 and h < image.shape[1]/4 and y > image.shape[1]/4:
+            if 2.5 <= w/h <= 6 and w < image.shape[0]/1.5 and h < image.shape[1]/4 and y > image.shape[1]/4 and x > 10 and y < image.shape[1]/1.5:
                 # Dibuixem un bbox a la imatge i guardem la info de les coordenades
+                print(x,y,w,h)
                 cv2.rectangle(image, (x-20, y-10), (x - 20 + w + 40, y - 10 + h + 15), (255, 255, 0), 2)  # (0, 255, 0) is the color of the rectangle (green), 2 is the line thickness
-                x_roi, y_roi, w_roi, h_roi = x-20, y - 10, w + 40, h + 15
+                x_roi, y_roi, w_roi, h_roi = max(0, x-20), max(0, y - 10), w + 40, h + 15
         else:
             if 2.5 <= w/h <= 6:
+                print(x,y,w,h)
                 cv2.rectangle(image, (x-20, y-10), (x - 20 + w + 40, y - 10 + h + 15), (255, 255, 0), 2)  # (0, 255, 0) is the color of the rectangle (green), 2 is the line thickness
-                x_roi, y_roi, w_roi, h_roi = x-20, y - 10, w + 40, h + 15
+                x_roi, y_roi, w_roi, h_roi = max(0, x-20), max(0, y - 10), w + 40, h + 15
 
     #cv2.imshow('Image with Bounding Boxes', image)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
 
-    return x_roi, y_roi, w_roi, h_roi, image
+    return x_roi, y_roi, w_roi, h_roi, gray_equalized, image
+
+detect_plate("fotos/cotxe2.jpeg")
