@@ -45,10 +45,10 @@ def anpr_pipeline(image_path, mode = 'Yolo'):
 df = pd.DataFrame(columns=['Model', 'foto', 'Plate'])
 types = ['SVM', 'Xarxa','EasyOCR'] #, 'Pytesseract'], 'Yolo']
 
-fotos = [f"cotxe{i}.jpeg" for i in range(1, 10)]
+fotos = [f"cotxe{i}.jpg" for i in range(1, 10)]
 for f in fotos:
     # print(t)
-    path = os.path.join('fotos', f)
+    path = os.path.join('./fotos', f)
     for t in types:
         plate = anpr_pipeline(path, t).replace(' ', '')
         df.loc[len(df)] = [t, f, plate]

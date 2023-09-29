@@ -71,10 +71,10 @@ def detect_plate(image_path):
                 cv2.rectangle(image, (x-20, y-10), (x - 20 + w + 40, y - 10 + h + 15), (255, 255, 0), 2)  # (0, 255, 0) is the color of the rectangle (green), 2 is the line thickness
                 x_roi, y_roi, w_roi, h_roi = max(0, x-20), max(0, y - 10), w + 40, h + 15
 
-    #cv2.imshow('Image with Bounding Boxes', image)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    cv2.imshow('Image with Bounding Boxes', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     return x_roi, y_roi, w_roi, h_roi, gray_equalized, image
 
-detect_plate("fotos/cotxe2.jpeg")
+#detect_plate("fotos/cotxe2.jpeg")
