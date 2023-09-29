@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 import imutils
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def detect_plate(image_path):
 

@@ -1,4 +1,7 @@
 import cv2
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def calculate_pixel_density(character_image):
     gray_char = cv2.cvtColor(character_image, cv2.COLOR_BGR2GRAY)

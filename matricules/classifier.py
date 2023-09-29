@@ -4,6 +4,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from feature_extractor import *
 import os
 import pickle
+from dotenv import load_dotenv
+
+load_dotenv()
 
 image_data = []
 character_labels = []
@@ -70,8 +73,8 @@ print(classification_report(num_labels, y_pred_numbers))
 print("\nClassification Report for Letters Classifier:")
 print(classification_report(letter_labels, y_pred_letters))
 """
-with open('svm_model_numbers.pkl', 'wb') as model_file:
+with open(os.getenv("svm_num_model"), 'wb') as model_file:
     pickle.dump(svm_classifier_numbers, model_file)
 
-with open('svm_model_letters.pkl', 'wb') as model_file:
+with open(os.getenv("svm_letters_model"), 'wb') as model_file:
     pickle.dump(svm_classifier_letters, model_file)

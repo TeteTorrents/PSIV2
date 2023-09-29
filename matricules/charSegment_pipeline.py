@@ -1,5 +1,8 @@
 import cv2
 from feature_extractor import calculate_pixel_density
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def segmentChars(roi, roi_o, debug = False):
 

@@ -5,6 +5,10 @@ from individual_char_recog import *
 from plateDetection_pipeline import detect_plate
 import prettytable as pt
 from tabulate import tabulate
+from dotenv import load_dotenv
+
+# Carreguem variables d'entorn
+load_dotenv()
 
 def anpr_pipeline(image_path, mode = 'Yolo'):
 
@@ -42,13 +46,15 @@ def anpr_pipeline(image_path, mode = 'Yolo'):
     #cv2.destroyAllWindows()
     return text
 
+
+"""
 df = pd.DataFrame(columns=['Model', 'foto', 'Plate'])
 types = ['SVM', 'Xarxa','EasyOCR'] #, 'Pytesseract'], 'Yolo']
 
 fotos = [f"cotxe{i}.jpg" for i in range(1, 10)]
 for f in fotos:
     # print(t)
-    path = os.path.join('./fotos', f)
+    path = os.path.join(os.getenv("ANPR_directory"), f)
     for t in types:
         plate = anpr_pipeline(path, t).replace(' ', '')
         df.loc[len(df)] = [t, f, plate]
@@ -59,6 +65,7 @@ for f in fotos:
     # print(f"DONE! {t}")
 
 print(tabulate(df, headers='keys', tablefmt='psql'))
+"""
 
 #path = 'fotos_profe/im8.jpeg'
 #anpr_pipeline(path, "SVM")
