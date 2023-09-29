@@ -76,5 +76,5 @@ def detect_plate(image_path):
     #cv2.destroyAllWindows()
 
     return x_roi, y_roi, w_roi, h_roi, gray_equalized, image
-
-detect_plate("fotos/cotxe2.jpeg")
+if __name__ == '__main__':
+    detect_plate("fotos/cotxe2.jpeg")
