@@ -47,7 +47,7 @@ def anpr_pipeline(image_path, mode = 'Yolo'):
     return text
 
 
-"""
+
 df = pd.DataFrame(columns=['Model', 'foto', 'Plate'])
 types = ['SVM', 'Xarxa','EasyOCR'] #, 'Pytesseract'], 'Yolo']
 
@@ -65,7 +65,7 @@ for f in fotos:
     # print(f"DONE! {t}")
 
 print(tabulate(df, headers='keys', tablefmt='psql'))
-"""
+
 
 #path = 'fotos_profe/im8.jpeg'
 #anpr_pipeline(path, "SVM")
