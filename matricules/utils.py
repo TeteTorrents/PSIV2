@@ -26,13 +26,14 @@ def adaptar_bbox_coords(bboxes, original_image_size, new_image_size):
     return adapted_bboxes
 
 # Calcular IoU
-def calculate_iou(bbox1, bbox2, image_o, debug = False):
+def calculate_iou(bbox1, bbox2, image_o, plate_mode = True, debug = False):
 
     # Adaptem les cooordenades predicted per nosaltres (perquè son en funció de la imatge retallada)
     y, x, _ = image_o.shape
-    crop_y_start, crop_x_start = int(1/3 * y), int(1/3 * x)
-    x1_o, y1_o, x2_o, y2_o = bbox1[0] + crop_x_start, bbox1[1] + crop_y_start, bbox1[0]+bbox1[2] + crop_x_start, bbox1[1]+bbox1[3] + crop_y_start
-    bbox1 = [x1_o, y1_o, x2_o-x1_o, y2_o-y1_o]
+    if plate_mode:
+        crop_y_start, crop_x_start = int(1/3 * y), int(1/3 * x)
+        x1_o, y1_o, x2_o, y2_o = bbox1[0] + crop_x_start, bbox1[1] + crop_y_start, bbox1[0]+bbox1[2] + crop_x_start, bbox1[1]+bbox1[3] + crop_y_start
+        bbox1 = [x1_o, y1_o, x2_o-x1_o, y2_o-y1_o]
 
     if debug:
         cv2.rectangle(image_o, (bbox1[0], bbox1[1]), (bbox1[0] + bbox1[2], bbox1[1] + bbox1[3]), (255, 255, 0), 2)

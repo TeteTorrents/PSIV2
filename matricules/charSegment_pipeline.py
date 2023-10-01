@@ -38,7 +38,7 @@ def segmentChars(roi, roi_o, debug = False):
         letters_bboxes.append((max(0, x-2),max(0, y-5),w+2,h+10))
     
     if debug:
-        cv2.imshow('Image with Bounding Boxes', roi)
+        cv2.imshow('Image with Bounding Boxes', roi_o)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 

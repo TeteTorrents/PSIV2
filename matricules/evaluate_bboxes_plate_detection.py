@@ -36,10 +36,10 @@ def comparar_pred(image_path, label_path, new_image_size, iou_threshold=0.8):
         return "Predicció incorrecta", iou
 
 # Directori amb el test
-images_dir = './test/images'
-labels_dir = './test/labels'
+images_dir = './matricules/test_plate_detection/images'
+labels_dir = './matricules/test_plate_detection/labels'
 mida_imatge_resized = (1000, 800)
-iou_threshold = 0.8
+iou_threshold = 0.65
 
 prediccions_correctes = 0
 imatges_totals = 0
