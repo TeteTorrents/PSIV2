@@ -4,3 +4,6 @@ matricules/Automatic-Number-Plate-Recognition-using-Yolov8-and-EasyOCR-Full-Cour
 
 #pycache
 matricules/__pycache__/
+
+# Ignore .env (descomenteu la següent linea un cop tothom tingui el .env)
+# .env 

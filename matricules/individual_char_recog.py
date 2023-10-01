@@ -9,15 +9,18 @@ from sklearn.metrics import accuracy_score, classification_report
 from PIL import Image
 import easyocr
 import pytesseract
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 def svm_recognizer(roi_ge, roi):
 
     # Load models:
-    with open('svm_model_numbers.pkl', 'rb') as model_file:
+    with open(os.getenv("svm_num_model"), 'rb') as model_file:
         svm_model_numbers = pickle.load(model_file)
 
-    with open('svm_model_letters.pkl', 'rb') as model_file:
+    with open(os.getenv("svm_letters_model"), 'rb') as model_file:
         svm_model_letters = pickle.load(model_file)
 
     bboxes = segmentChars(roi_ge, roi)
@@ -44,7 +47,7 @@ def nn_recognizer(roi_ge, roi):
         nn.Dropout(0.5),
         nn.Linear(512, 36)
     )  
-    loaded_model.load_state_dict(torch.load('your_model_state_dict.pth'))
+    loaded_model.load_state_dict(torch.load(os.getenv("nn_model")))
 
     transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -82,8 +85,9 @@ def easyOCR_recognizer(roi):
     return output[0][1]
 
 def pytesseract_recognizer(roi):
-    return pytesseract.image_to_string(roi, config='--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns xxx.patterns')
+    return pytesseract.image_to_string(roi, config=f'--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns {os.getenv("xxx_patterns")}')
 
+"""
 if __name__ == '__main__':
     image_o = cv2.imread('fotos/cotxe6.jpg')
     image_o = cv2.resize(image_o, (1000, 800))
@@ -100,3 +104,4 @@ if __name__ == '__main__':
     print(nn_recognizer(roi))
     print(easyOCR_recognizer(roi))
     print(pytesseract_recognizer(roi))
+"""

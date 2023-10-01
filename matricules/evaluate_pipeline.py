@@ -3,6 +3,9 @@ from ANPR_pipeline import anpr_pipeline
 from nltk.metrics import edit_distance
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
     
@@ -12,7 +15,7 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
 
     # Iterem per tots els arxius del dir
     for filename in os.listdir(img_dir):
-        if filename.endswith('.jpeg'):
+        if filename.endswith('.jpg'):
             image_path = os.path.join(img_dir, filename)
             true_label = os.path.splitext(filename)[0]
 
@@ -48,5 +51,4 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
 
     return cla, wla, edit_distances, "cm", f1, recall, precision
 
-
-evaluate_anpr_pipeline('./img_test_final', 'Xarxa')
+evaluate_anpr_pipeline(os.getenv("evaluation_directory"), 'Xarxa')

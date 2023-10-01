@@ -1,8 +1,12 @@
 import cv2
 import numpy as np
 import imutils
+from dotenv import load_dotenv
+import os
 
-def detect_plate(image_path):
+load_dotenv()
+
+def detect_plate(image_path, debug = False):
 
     # Llegim la imatge
     image_o = cv2.imread(image_path)
@@ -49,31 +53,38 @@ def detect_plate(image_path):
     totalLabels, labelsInfo, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, 8, cv2.CV_32S)
 
     # Iterem per tots els elemnts trobats i ens quedem amb la bbox de la licence plate
-    # AIXÒ S'HA D'ARREGLAR PERQUÈ HO FACI BÉ!!!!!! (LA PART DE LA CONDICIÓ PRINCIPALMENT)
-
     cnt_rat = 0
     for label in range(1, totalLabels):
         x, y, w, h, _ = stats[label]
         if 2.5 <= w/h <= 6:
             cnt_rat += 1
 
+    bboxes = []
     for label in range(1, totalLabels):
         x, y, w, h, _ = stats[label]
         if cnt_rat > 1:
-            if 2.5 <= w/h <= 6 and w < image.shape[0]/1.5 and h < image.shape[1]/4 and y > image.shape[1]/4 and x > 10 and y < image.shape[1]/1.5:
-                # Dibuixem un bbox a la imatge i guardem la info de les coordenades
-                print(x,y,w,h)
-                cv2.rectangle(image, (x-20, y-10), (x - 20 + w + 40, y - 10 + h + 15), (255, 255, 0), 2)  # (0, 255, 0) is the color of the rectangle (green), 2 is the line thickness
+            if 2.5 <= w/h <= 6 and w < image.shape[0]/1.5 and h < image.shape[1]/4 and y > image.shape[1]/5.5 and x > 10 and y < image.shape[1]/1.5:
                 x_roi, y_roi, w_roi, h_roi = max(0, x-20), max(0, y - 10), w + 40, h + 15
+                bboxes.append([x_roi, y_roi, w_roi, h_roi])
         else:
             if 2.5 <= w/h <= 6:
-                print(x,y,w,h)
-                cv2.rectangle(image, (x-20, y-10), (x - 20 + w + 40, y - 10 + h + 15), (255, 255, 0), 2)  # (0, 255, 0) is the color of the rectangle (green), 2 is the line thickness
                 x_roi, y_roi, w_roi, h_roi = max(0, x-20), max(0, y - 10), w + 40, h + 15
+                bboxes.append([x_roi, y_roi, w_roi, h_roi])
 
-    #cv2.imshow('Image with Bounding Boxes', image)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    if not bboxes:
+        x_roi, y_roi, w_roi, h_roi = 0, 0, 0, 0
+    elif len(bboxes) == 1:
+        x_roi, y_roi, w_roi, h_roi = bboxes[0]
+    else:
+        sorted_bboxes = sorted(bboxes, key=lambda bbox: bbox[2] * bbox[3])
+        x_roi, y_roi, w_roi, h_roi = sorted_bboxes[0]
+
+    if debug:
+        cv2.rectangle(image, (x_roi, y_roi), (x_roi + w_roi, y_roi + h_roi), (255, 255, 0), 2)  
+
+        cv2.imshow('Image with Bounding Boxes', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return x_roi, y_roi, w_roi, h_roi, gray_equalized, image
 if __name__ == '__main__':
