@@ -23,7 +23,6 @@ def comparar_pred(bb_pred, bb_gt, roi, iou_threshold):
 # Directori amb el test
 images_dir = './matricules/test_segmentation/images'
 labels_dir = './matricules/test_segmentation/labels'
-mida_imatge_resized = (1000, 800)
 iou_threshold = 0.65
 
 prediccions_correctes = 0
