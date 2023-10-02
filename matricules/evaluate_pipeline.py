@@ -1,15 +1,21 @@
 from ANPR_pipeline import anpr_pipeline
-
+import re
 from nltk.metrics import edit_distance
-from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 import os
 from dotenv import load_dotenv
+import numpy as np
 
 load_dotenv()
 
+labels_aux = ["2765HKR", "7784JGC", "7549LMH", "1296KSV", "2765HKR", "4135FNX", "1074KSN", "8622LW", "2765HKR",
+              "5479HHR", "3572CLX", "3572CLX", "7084JKZ", "1842JJN", "6729HH", "7105GV", "9848HSZ", "3235MKB",
+              "7718GZC", "1074KSN", "2907HTR", "8622L", "4287KGJ", "1074KSN", "2976LY", "9101FLC", "5865LZT",
+              "9057HST", "7362LWV", "5895KKT"]
+ind = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+labels_dict = cotxe_dict = {f'cotxe{i}': label for i, label in zip(ind, labels_aux)}
+
 def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
     
-    # List to store recognized values and true labels
     true_labels = []
     recognized_labels = []
 
@@ -17,14 +23,18 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
     for filename in os.listdir(img_dir):
         if filename.endswith('.jpg'):
             image_path = os.path.join(img_dir, filename)
-            true_label = os.path.splitext(filename)[0]
+            true_label = labels_dict[filename.split('_')[0]]
 
             # Utilitzem pla ANPR pipeline per trobar el text que se'ns detecta
             recognized_label = anpr_pipeline(image_path, mode)
 
-            # Afegim els elements a la llista
+            # Si el recognized label és None
+            if recognized_label is None:
+                recognized_labels.append(["ñ"]*len(true_label))
+            else:
+                # Afegim els elements a la llista
+                recognized_labels.append(re.sub(r'[^A-Za-z1-9]', '', recognized_label))
             true_labels.append(true_label)
-            recognized_labels.append(recognized_label)
 
     ### Calculem les mètriques
 
@@ -40,15 +50,7 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
     # Edit Distance
     edit_distances = [edit_distance(true, recognized) for true, recognized in zip(true_labels, recognized_labels)]
 
-    # Confusion Matrix
-    all_characters = set(''.join(true_labels + recognized_labels))
-    #cm = confusion_matrix(''.join(true_labels), ''.join(recognized_labels), labels=list(all_characters))
+    return cla, wla, edit_distances
 
-    # F1 Score, recall i precision
-    f1 = f1_score(true_labels, recognized_labels, average='weighted')
-    recall = recall_score(true_labels, recognized_labels, average='weighted')
-    precision = precision_score(true_labels, recognized_labels, average='weighted')
-
-    return cla, wla, edit_distances, "cm", f1, recall, precision
-
-evaluate_anpr_pipeline(os.getenv("evaluation_directory"), 'Xarxa')
+cla, wla, edit_distances = evaluate_anpr_pipeline(os.getenv("evaluation_directory"), 'EasyOCR')
+print("DONE")
