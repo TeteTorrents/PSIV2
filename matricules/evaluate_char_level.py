@@ -45,10 +45,10 @@ for image_filename in os.listdir(images_dir):
         svm_predictions.append(svm_recognizer(image_gray, image))
         nn_predictions.append(nn_recognizer(image_gray, image))
         easyOcr_predictions.append(list(re.sub(r'[^A-Za-z1-9]', '', easyOCR_recognizer(image))))
-        #pyt_predictions.append(pytesseract_recognizer(image))
+        pyt_predictions.append(pytesseract_recognizer(image))
 
 # Calculem les mètriques
-for i, predictions in enumerate([svm_predictions, nn_predictions, easyOcr_predictions]):
+for i, predictions in enumerate([svm_predictions, nn_predictions, easyOcr_predictions, pyt_predictions]):
     # Inicialitzem helper vars
     total_characters = 0
     total_correct = 0
@@ -82,7 +82,7 @@ for i, predictions in enumerate([svm_predictions, nn_predictions, easyOcr_predic
     confusion_matrices.append(confusion)
     lletres_cm.append("".join(sorted(list(set(true_labels + pred_labels)))))
 
-metodes = ["SVM", "Xarxa", "easyOCR"]
+metodes = ["SVM", "Xarxa", "easyOCR", "Pytesseract"]
 blueish_palette = sn.color_palette("Blues")
 for i in range(len(metodes)):
     print(f"Metrics for {metodes[i]}:")

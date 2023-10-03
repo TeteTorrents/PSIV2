@@ -3,10 +3,11 @@ import numpy as np
 import imutils
 from dotenv import load_dotenv
 import os
+from ultralytics import YOLO
 
 load_dotenv()
 
-def detect_plate(image_path, debug = False):
+def detect_plate_classic(image_path, debug = False):
 
     # Llegim la imatge
     image_o = cv2.imread(image_path)
@@ -87,5 +88,31 @@ def detect_plate(image_path, debug = False):
         cv2.destroyAllWindows()
 
     return x_roi, y_roi, w_roi, h_roi, gray_equalized, image
-if __name__ == '__main__':
-    detect_plate("fotos/cotxe2.jpeg")
+
+def detect_plate_yolo(image_path, debug = False):
+    # Llegim la imatge
+    image_o = cv2.imread(image_path)
+    image_o = cv2.resize(image_o, (1000, 800))
+    y,x,_ = image_o.shape
+    image = image_o[int(1/3*y):, int(1/3*x):]
+
+    # Passem la imatge a escala de grisos (?)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    #Fem equalització del histograma
+    gray_equalized = cv2.equalizeHist(gray)
+
+    # Detectem la placa amb YOLO
+    model = YOLO(r'Yolov8\models\license_plate_detector.pt')
+    results = model(image)
+    x1,y1,x2,y2 = results[0].boxes.xyxy[0]
+    x,y,w,h = x1,y1,x2-x1,y2-y1
+
+    if debug:
+        cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 2)  
+
+        cv2.imshow('Image with Bounding Boxes', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()        
+
+    return x, y, w, h, gray_equalized, image

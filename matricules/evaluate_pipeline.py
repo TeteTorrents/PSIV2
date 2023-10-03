@@ -14,7 +14,7 @@ labels_aux = ["2765HKR", "7784JGC", "7549LMH", "1296KSV", "2765HKR", "4135FNX", 
 ind = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 labels_dict = cotxe_dict = {f'cotxe{i}': label for i, label in zip(ind, labels_aux)}
 
-def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
+def evaluate_anpr_pipeline(img_dir, recog_mode = 'SVM', detect_mode = 'Yolo'):
     
     true_labels = []
     recognized_labels = []
@@ -26,11 +26,12 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
             true_label = labels_dict[filename.split('_')[0]]
 
             # Utilitzem pla ANPR pipeline per trobar el text que se'ns detecta
-            recognized_label = anpr_pipeline(image_path, mode)
+            recognized_label = anpr_pipeline(image_path, recog_mode, detect_mode)
 
             # Si el recognized label és None
             if recognized_label is None:
-                recognized_labels.append(["ñ"]*len(true_label))
+                aux = ["ñ"]*len(true_label)
+                recognized_labels.append(''.join(aux))
             else:
                 # Afegim els elements a la llista
                 recognized_labels.append(re.sub(r'[^A-Za-z1-9]', '', recognized_label))
@@ -44,7 +45,7 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
     cla = 1 - (correct_characters / total_characters)
 
     # Word-Level Accuracy (WLA)
-    correct_words = sum(1 for true, recognized in zip(true_labels, recognized_labels) if true == recognized)
+    correct_words = sum(1 for true, recognized in zip(true_labels, recognized_labels) if (true == recognized) or (edit_distance(true, recognized) < 2))
     wla = correct_words / len(true_labels)
 
     # Edit Distance
@@ -52,5 +53,11 @@ def evaluate_anpr_pipeline(img_dir, mode = 'Yolo'):
 
     return cla, wla, edit_distances
 
-cla, wla, edit_distances = evaluate_anpr_pipeline(os.getenv("evaluation_directory"), 'EasyOCR')
+for rm in ['Yolo']:
+    for dm in ['SVM', 'Xarxa', 'EasyOCR', 'Pytesseract']:
+        cla, wla, edit_distances = evaluate_anpr_pipeline(os.getenv("evaluation_directory"), dm, rm)
+        print(rm)
+        print(dm)
+        print(cla, wla, np.mean(edit_distances))
+        print("==============")
 print("DONE")
