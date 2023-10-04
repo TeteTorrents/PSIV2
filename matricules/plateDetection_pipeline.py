@@ -21,9 +21,6 @@ def detect_plate_classic(image_path, debug = False):
     #Fem equalització del histograma
     gray_equalized = cv2.equalizeHist(gray)
 
-    #Fem otsu
-    #ret_val, otsu_binary = cv2.threshold(gray_equalized, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
     # Fem un closing -> dilatar + erosionar
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     closed_image = cv2.morphologyEx(gray_equalized, cv2.MORPH_CLOSE, kernel, iterations = 2)
@@ -38,8 +35,6 @@ def detect_plate_classic(image_path, debug = False):
     # Fem opening -> erosionar + dilatar
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 25))
     open_image = cv2.morphologyEx(closed_image2, cv2.MORPH_OPEN, kernel, iterations = 1)
-    hist1 = np.histogram(open_image.flatten())
-
 
     # Binaritzem la imatge mitjançant la operació de thresholding (definim un threshold de 80)
     _, binary_image = cv2.threshold(open_image, 85, 255, cv2.THRESH_BINARY)
@@ -51,7 +46,7 @@ def detect_plate_classic(image_path, debug = False):
     eroded_image = cv2.dilate(rem_elem_image, kernel, iterations=3)
 
     # De la imatge resultant obtenim el elements (per segmentar la licence plate) amb l'algoritme de Connected Component Labeling
-    totalLabels, labelsInfo, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, 8, cv2.CV_32S)
+    totalLabels, _, stats, _ = cv2.connectedComponentsWithStats(eroded_image, 8, cv2.CV_32S)
 
     # Iterem per tots els elemnts trobats i ens quedem amb la bbox de la licence plate
     cnt_rat = 0
@@ -81,7 +76,7 @@ def detect_plate_classic(image_path, debug = False):
         x_roi, y_roi, w_roi, h_roi = sorted_bboxes[0]
 
     if debug:
-        cv2.rectangle(image, (x_roi, y_roi), (x_roi + w_roi, y_roi + h_roi), (255, 255, 0), 2)  
+        cv2.rectangle(image, (x_roi, y_roi), (x_roi + w_roi, y_roi + h_roi), (255, 255, 0), 2)
 
         cv2.imshow('Image with Bounding Boxes', image)
         cv2.waitKey(0)
@@ -116,3 +111,5 @@ def detect_plate_yolo(image_path, debug = False):
         cv2.destroyAllWindows()        
 
     return x, y, w, h, gray_equalized, image
+
+detect_plate_classic(r"fotos\cotxe5.jpg", True)
