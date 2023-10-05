@@ -35,6 +35,8 @@ def comparar_pred(image_path, label_path, new_image_size, iou_threshold=0.8, mod
     # Miren en funció d'un threshold si la bboxes detectada pel nostre sistema és correcte o no
     if iou >= iou_threshold:
         return "Predicció correcta", iou
+    elif iou > 0:
+        return "FNR", iou
     else:
         return "Predicció incorrecta", iou
 
@@ -42,9 +44,11 @@ def comparar_pred(image_path, label_path, new_image_size, iou_threshold=0.8, mod
 images_dir = './matricules/test_plate_detection/images'
 labels_dir = './matricules/test_plate_detection/labels'
 mida_imatge_resized = (1000, 800)
-iou_threshold = 0.7
+iou_threshold = 0.65
 
 prediccions_correctes = 0
+fnr = 0
+fpr = 0
 imatges_totals = 0
 iou_total = 0.0
 
@@ -62,11 +66,20 @@ for mode in ['Classic', 'Yolo']:
             
             if detection_result == "Predicció correcta":
                 prediccions_correctes += 1
+            elif detection_result == "FNR":
+                fnr += 1
+            else:
+                fpr += 1
+
 
     # Calculate accuracy and average IoU
     print(mode)
     accuracy = (prediccions_correctes / imatges_totals) * 100 if imatges_totals > 0 else 0
+    precision = (prediccions_correctes / (prediccions_correctes + fpr)) * 100
+    recall = (prediccions_correctes / (prediccions_correctes + fnr)) * 100
     average_iou = iou_total / imatges_totals if imatges_totals > 0 else 0
 
     print(f"Accuracy: {accuracy:.2f}%")
+    print(f"Precision: {precision:.2f}%")
+    print(f"Recall: {recall:.2f}%")
     print(f"IoU mitjà: {average_iou:.4f}")

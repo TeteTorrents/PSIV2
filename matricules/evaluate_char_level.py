@@ -99,22 +99,19 @@ for i in range(len(metodes)):
 pra_char = {}
 for i in range(len(metodes)):
     pra_char[metodes[i]] = {}
-    for char in lletres_cm[1]:
-        char_index = ord(char) - ord('A') 
+    for char_index, char in enumerate(lletres_cm[i]):
         
         # Calculem la precisió per cada lletra
-        true_positive = confusion_matrices[1][char_index, char_index]
-        false_positive = sum(confusion_matrices[1][:, char_index]) - true_positive
-        false_negative = sum(confusion_matrices[1][char_index, :]) - true_positive
+        true_positive = confusion_matrices[i][char_index, char_index]
+        false_positive = sum(confusion_matrices[i][:, char_index]) - true_positive
+        false_negative = sum(confusion_matrices[i][char_index, :]) - true_positive
         precision = true_positive / (true_positive + false_positive)
         
         # Calculem la recall
         recall = true_positive / (true_positive + false_negative)
         
         # Calcula l'accur
-        total_correct = sum(np.diag(confusion_matrices[1]))
-        total_characters = sum(sum(confusion_matrices[1]))
-        accuracy = total_correct / total_characters
+        accuracy = confusion_matrices[i][char_index][char_index] / np.sum(confusion_matrices[i][char_index])
         
         pra_char[metodes[i]][char] = [accuracy, precision, recall]
 

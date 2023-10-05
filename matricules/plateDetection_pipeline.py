@@ -111,5 +111,3 @@ def detect_plate_yolo(image_path, debug = False):
         cv2.destroyAllWindows()        
 
     return x, y, w, h, gray_equalized, image
-
-detect_plate_classic(r"fotos\cotxe5.jpg", True)
