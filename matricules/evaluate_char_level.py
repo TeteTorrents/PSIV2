@@ -11,14 +11,13 @@ import pandas as pd
 import numpy as np
 
 # Directori amb el test
-images_dir = './matricules/test_segmentation/images'
+images_dir = './matricules/test_segmentation/images_yolo'
 
 # Hard-code labels
 labels_aux = ["2765HKR", "7784JGC", "7549LMH", "1296KSV", "2765HKR", "4135FNX", "1074KSN", "8622LW", "2765HKR",
-            "5479HHR", "3572CLX", "1842JJN", "6729HH", "7105GV", "9848HSZ", "3235MKB", "7718GZC", "1074KSN",
-            "2907HTR", "8622L", "4287KGJ", "1074KSN", "2976LY", "9101FLC", "5865LZT", "7362LWV", "5895KKT"]
-ind = [1,2,3,4,5,6,7,8,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25,26,27,29,30]
-labels_dict = cotxe_dict = {f'cotxe{i}': label for i, label in zip(ind, labels_aux)}
+            "5479HHR", "3572CLX", "3572CLX", "7084JKZ", "1842JJN", "6729HHT", "7105GVT", "9848HSZ", "3235MKB", "7718GZC", "1074KSN",
+            "2907HTR", "8622LKW", "4287KGJ", "1074KSN", "2976LYC", "9101FLC", "5865LZT", "9057HST", "7362LWV", "5895KKT"]
+labels_dict = cotxe_dict = {f'cotxe{i+1}': label for i, label in enumerate(labels_aux)}
 labels = []
 
 # Mètriques
@@ -44,8 +43,8 @@ for image_filename in os.listdir(images_dir):
         # Obtenim la predicció per cada model
         svm_predictions.append(svm_recognizer(image_gray, image))
         nn_predictions.append(nn_recognizer(image_gray, image))
-        easyOcr_predictions.append(list(re.sub(r'[^A-Za-z1-9]', '', easyOCR_recognizer(image))))
-        pyt_predictions.append(pytesseract_recognizer(image))
+        easyOcr_predictions.append(easyOCR_recognizer(image_gray, image))
+        pyt_predictions.append(pytesseract_recognizer(image_gray, image))
 
 # Calculem les mètriques
 for i, predictions in enumerate([svm_predictions, nn_predictions, easyOcr_predictions, pyt_predictions]):
@@ -88,34 +87,13 @@ for i in range(len(metodes)):
     print(f"Metrics for {metodes[i]}:")
     print(f"Accuracy: {accuracies[i]:.2f}")
     print("Confusion Matrix:\n")
-    df_cm = pd.DataFrame(confusion_matrices[i], index = [i for i in lletres_cm[i]],
+    try:
+        df_cm = pd.DataFrame(confusion_matrices[i], index = [i for i in lletres_cm[i]],
                   columns = [i for i in lletres_cm[i]])
+    except:
+        df_cm = pd.DataFrame(confusion_matrices[i], index = [i for i in lletres_cm[i].replace('_', '')],
+                  columns = [i for i in lletres_cm[i].replace('_', '')])
     plt.figure(figsize = (10,7))
     sn.heatmap(df_cm, annot=False, cmap=blueish_palette)
     plt.title(f"Confusion Matrix {metodes[i]}")
     plt.savefig(f"./matricules/heatmaps/hm_{metodes[i]}.png")
-
-
-pra_char = {}
-for i in range(len(metodes)):
-    pra_char[metodes[i]] = {}
-    for char_index, char in enumerate(lletres_cm[i]):
-        
-        # Calculem la precisió per cada lletra
-        true_positive = confusion_matrices[i][char_index, char_index]
-        false_positive = sum(confusion_matrices[i][:, char_index]) - true_positive
-        false_negative = sum(confusion_matrices[i][char_index, :]) - true_positive
-        precision = true_positive / (true_positive + false_positive)
-        
-        # Calculem la recall
-        recall = true_positive / (true_positive + false_negative)
-        
-        # Calcula l'accur
-        accuracy = confusion_matrices[i][char_index][char_index] / np.sum(confusion_matrices[i][char_index])
-        
-        pra_char[metodes[i]][char] = [accuracy, precision, recall]
-
-df = pd.DataFrame(pra_char)
-df = df.transpose()
-print(df)
-print("DONE!")

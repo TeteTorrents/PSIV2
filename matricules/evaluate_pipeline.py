@@ -45,7 +45,7 @@ def evaluate_anpr_pipeline(img_dir, recog_mode = 'SVM', detect_mode = 'Yolo'):
     cla = 1 - (correct_characters / total_characters)
 
     # Word-Level Accuracy (WLA)
-    correct_words = sum(1 for true, recognized in zip(true_labels, recognized_labels) if (true == recognized) or (edit_distance(true, recognized) < 2))
+    correct_words = sum(1 for true, recognized in zip(true_labels, recognized_labels) if (true == recognized))
     wla = correct_words / len(true_labels)
 
     # Edit Distance
@@ -54,7 +54,7 @@ def evaluate_anpr_pipeline(img_dir, recog_mode = 'SVM', detect_mode = 'Yolo'):
     return cla, wla, edit_distances
 
 for rm in ['Yolo']:
-    for dm in ['SVM', 'Xarxa', 'EasyOCR', 'Pytesseract']:
+    for dm in ['EasyOCR', 'Xarxa']:
         cla, wla, edit_distances = evaluate_anpr_pipeline(os.getenv("evaluation_directory"), dm, rm)
         print(rm)
         print(dm)

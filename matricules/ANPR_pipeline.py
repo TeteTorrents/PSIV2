@@ -33,9 +33,9 @@ def anpr_pipeline(image_path, recog_mode = 'SVM', detect_mode = 'Yolo', debug = 
         elif recog_mode == 'Xarxa':
             recog_result = nn_recognizer(roi_ge, roi_o)
         elif recog_mode == 'EasyOCR':
-            recog_result = easyOCR_recognizer(roi_o)
+            recog_result = easyOCR_recognizer(roi_ge, roi_o)
         elif recog_mode == 'Pytesseract':
-            recog_result = pytesseract_recognizer(roi_o)
+            recog_result = pytesseract_recognizer(roi_ge, roi_o)
 
     text = ''.join(recog_result)
     if debug:

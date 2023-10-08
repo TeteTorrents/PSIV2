@@ -11,7 +11,7 @@ import easyocr
 import pytesseract
 from dotenv import load_dotenv
 import os
-
+import random
 load_dotenv()
 
 def svm_recognizer(roi_ge, roi):
@@ -77,15 +77,52 @@ def nn_recognizer(roi_ge, roi):
         result.append(predicted_letter)
     return result
 
-def easyOCR_recognizer(roi):
+def easyOCR_recognizer(roi_ge, roi):
     reader = easyocr.Reader(['en'])
-    output = reader.readtext(roi)
-    if len(output) == 0:
-        return ''
-    return output[0][1]
+    
+    bboxes = segmentChars(roi_ge, roi)
+    bboxes_sorted = sorted(bboxes, key=lambda x: x[0])
+    result = []
 
-def pytesseract_recognizer(roi):
-    return pytesseract.image_to_string(roi, config=f'--psm 8 --oem 3 -c tessedit_char_whitelist=BCDFGHJKLMNPRSTVWXYZ0123456789 --user-patterns {os.getenv("xxx_patterns")}')
+    for _,bbox in enumerate(bboxes_sorted):
+        x_roi, y_roi, w_roi, h_roi = bbox
+        char_roi = roi[y_roi:y_roi+h_roi, x_roi:x_roi+w_roi]
+        char_roi_gray = cv2.cvtColor(char_roi, cv2.COLOR_BGR2GRAY)
+        _, aux = cv2.threshold(char_roi_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        inverted_threshed = cv2.bitwise_not(aux)
+        prediction = reader.readtext(inverted_threshed)
+        if prediction == []:
+            result.append(random.choice("BCDFGHJKLMNPRSTVWXYZ0123456789"))
+        else:
+            result.append(prediction[0][1])
+    
+    return result
+    
+
+def pytesseract_recognizer(roi_ge, roi):
+
+    bboxes = segmentChars(roi_ge, roi)
+    bboxes_sorted = sorted(bboxes, key=lambda x: x[0])
+    result = []
+    
+    letters_whitelist = "BCDFGHJKLMNPRSTVWXYZ0123456789"
+    custom_patterns = os.getenv("xxx_patterns")
+    custom_config = f'--psm 6 -c tessedit_char_whitelist={letters_whitelist} --user-patterns {custom_patterns}'
+
+    for _,bbox in enumerate(bboxes_sorted):
+        x_roi, y_roi, w_roi, h_roi = bbox
+        char_roi = roi[y_roi:y_roi+h_roi, x_roi:x_roi+w_roi]
+        char_roi_gray = cv2.cvtColor(char_roi, cv2.COLOR_BGR2GRAY)
+        _, aux = cv2.threshold(char_roi_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        inverted_threshed = cv2.bitwise_not(aux)
+        prediction = pytesseract.image_to_string(inverted_threshed, config=custom_config)
+        if prediction == '':
+            random.choice(letters_whitelist)
+        else:
+            result.append(prediction[:-1])
+    
+    return result
+
 
 """
 if __name__ == '__main__':

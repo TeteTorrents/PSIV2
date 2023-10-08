@@ -104,7 +104,7 @@ def detect_plate_yolo(image_path, debug = False):
     x,y,w,h = x1,y1,x2-x1,y2-y1
 
     if debug:
-        cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 2)  
+        cv2.rectangle(image, (int(x), int(y)), (int(x)+int(w), int(y)+int(h)), (255, 255, 0), 2)  
 
         cv2.imshow('Image with Bounding Boxes', image)
         cv2.waitKey(0)
