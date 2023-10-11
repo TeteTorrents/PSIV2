@@ -1,8 +1,8 @@
 import os
 import cv2
 import pandas as pd
-from individual_char_recog import *
-from plateDetection_pipeline import detect_plate_classic, detect_plate_yolo
+from matricules.char_recognition.individual_char_recog import *
+from matricules.detection.plateDetection_pipeline import detect_plate_classic, detect_plate_yolo
 import prettytable as pt
 from tabulate import tabulate
 from dotenv import load_dotenv

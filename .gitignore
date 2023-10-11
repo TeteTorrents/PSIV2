@@ -15,3 +15,6 @@ matricules/__pycache__/
 *.gif
 *.bmp
 
+# Yolo ignores
+matricules/models/YoloV8/*
+!/matricules/models/YoloV8/models/
