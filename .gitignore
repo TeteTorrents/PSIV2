@@ -19,3 +19,6 @@ matricules/__pycache__/
 # Yolo ignores
 matricules/models/YoloV8/*
 !/matricules/models/YoloV8/models/
+
+### PROJECTE TRACKING
+car_tracker/videos/short.npy
