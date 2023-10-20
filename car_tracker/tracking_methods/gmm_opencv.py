@@ -7,12 +7,24 @@ cap = cv2.VideoCapture(r'car_tracker\videos\short.mp4')
 # Inicialitzem el substractor
 fgbg = cv2.createBackgroundSubtractorMOG2()
 
-# Definim parametres
+# Definim parametres i variables
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)) 
 min_contour_area = 2000
 cars = {}
 cars_timeouts = {}
-car_timeout_threshold = 50
+vect_dir = {}
+car_directions = {}
+car_id_counter = 0
+delay_frame = 75
+frame_count = {}
+car_timeout_threshold = 100
+cars_up, cars_down = 0, 0
+
+# To write result
+#size = (450, 600) 
+#result = cv2.VideoWriter('car_tracker/tracking_methods/sols/gmm.avi',  
+#                         cv2.VideoWriter_fourcc(*'MJPG'), 
+#                         10, size) 
 
 # Iterem pels diferents frames
 while True:
@@ -26,16 +38,6 @@ while True:
     # Apliquem GMM background substraction al frame + netegem
     fgmask = fgbg.apply(value_channel)
     mask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
-    """
-    kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))
-    mask = cv2.erode(mask, kernel2, iterations = 1)
-    kernel3 = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 15))
-    mask = cv2.erode(mask, kernel3, iterations = 1)
-    kernel4 = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
-    mask = cv2.dilate(mask, kernel4, iterations = 3)
-    kernel5 = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 10))
-    mask = cv2.dilate(mask, kernel5, iterations = 3)
-    """
 
     # Trobem els contorns + Ignorem la part superior del video
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -46,6 +48,11 @@ while True:
 
     # Actualitzem temps de desapareinxa dels cotxes
     for car_id in cars.keys():
+
+        if car_id not in car_directions:
+            car_directions[car_id] = "undetermined"
+            frame_count[car_id] = 0
+
         if car_id in cars:
             cars_timeouts[car_id] += 1
         else:
@@ -72,13 +79,43 @@ while True:
             
             # Si hi ha cotxe prop dels identificadors, actualitzem el seu valor
             if closest_car_id is not None:
+                aux = cars[closest_car_id]['centroid'][1]
                 new_cars[closest_car_id] = {'centroid': (cx, cy)}
                 cars_timeouts[closest_car_id] = 0 # Fem reset si encara es detecta el cotxe
+                vect_dir[closest_car_id].append(1 if (new_cars[closest_car_id]['centroid'][1] - aux) < 0 else -1)
             else: # en cas contrari creem nou cotxe
                 if cx > 200 and (cy > 530 or cy < 430):
-                    new_car_id = len(cars) + 1
+                    new_car_id = car_id_counter + 1
+                    car_id_counter += 1
                     new_cars[new_car_id] = {'centroid': (cx, cy)}
                     cars_timeouts[new_car_id] = 0
+                    vect_dir[new_car_id] = []
+            
+            #print(int(cy))
+            if int(cy) in [i for i in range(530, 545)]:
+                if closest_car_id is not None:
+                    if sum(vect_dir[closest_car_id][int(len(vect_dir[closest_car_id])/1.3):]) > 0:
+                        if car_directions[closest_car_id] == "down":
+                            frame_count[closest_car_id] = 1
+                        else:
+                            frame_count[closest_car_id] += 1
+                        
+                        if frame_count[closest_car_id] >= delay_frame or frame_count[closest_car_id] == 1:
+                            if car_directions[car_id] == "down":
+                                cars_down -= 1
+                            car_directions[car_id] = "up"
+                            cars_up += 1
+                    else:
+                        if car_directions[closest_car_id] == "up":
+                            frame_count[closest_car_id] = 1
+                        else:
+                            frame_count[closest_car_id] += 1
+                        
+                        if frame_count[closest_car_id] >= delay_frame or frame_count[closest_car_id] == 1:
+                            if car_directions[car_id] == "up":
+                                cars_up -= 1
+                            car_directions[car_id] = "down"
+                            cars_down += 1
     
     # Eliminem els cotxes que no es veuen/detecten desde fa molt
     cars_to_remove = [car_id for car_id, timeout in cars_timeouts.items() if timeout >= car_timeout_threshold]
@@ -88,18 +125,24 @@ while True:
 
     cars = new_cars.copy()
 
-    #cv2.circle(frame, (150, 350), 8, (255, 255, 0), -1)
+    cv2.circle(frame, (150, 530), 8, (255, 255, 0), -1)
     for car_id, car_info in cars.items():
         cx, cy = car_info['centroid']
         cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
+        cv2.putText(frame, f"id:{car_id}", (cx+5, cy+5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    print(cars)
-
-    cv2.imshow('frame', frame)
-    cv2.imshow('vc', value_channel)
-    cv2.imshow('mask', mask)
+    cv2.putText(frame, f"PUJA: {cars_up}", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.putText(frame, f"BAIXA: {cars_down}", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    frame_resized = cv2.resize(frame, (450, 600))
+    vc_resized = cv2.resize(value_channel, (450, 600))
+    mask_resized = cv2.resize(mask, (450, 600))
+    cv2.imshow('frame', frame_resized)
+    cv2.imshow('vc', vc_resized)
+    cv2.imshow('mask', mask_resized)
+    #result.write(frame_resized)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
+#result.release()
 cap.release()
 cv2.destroyAllWindows()

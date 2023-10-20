@@ -4,12 +4,11 @@ from sklearn.cluster import DBSCAN
 from collections import defaultdict
 
 # Obrir video
-cap = cv2.VideoCapture(r'car_tracker\videos\shadow.mp4')
+cap = cv2.VideoCapture(r'car_tracker\videos\short.mp4')
 
 # Parametres pel Lucas-Kanade Optical Flow
 lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 feature_params = dict(maxCorners = 20, qualityLevel = 0.1, minDistance = 20, blockSize = 5)
-
 
 # Altres parametres
 trajectory_len = 20
@@ -21,6 +20,13 @@ cars_up = 0
 cars_down = 0
 can_execute = True
 aux_frame = 0
+
+# To write result
+#size = (450, 600) 
+#result = cv2.VideoWriter('car_tracker/tracking_methods/sols/opf.avi',  
+#                         cv2.VideoWriter_fourcc(*'MJPG'), 
+#                         10, size) 
+
 
 while True:
 
@@ -52,7 +58,7 @@ while True:
                 del trajectory[0]
             new_trajectories.append(trajectory)
             try:
-                new_vect_dir[idx].append(1 if (trajectory[-1][-1] - trajectory[-2][-1]) < 0 else 0)
+                new_vect_dir[idx].append(1 if (trajectory[-1][-1] - trajectory[-2][-1]) < 0 else -1)
             except:
                 new_vect_dir[idx] = [1 if (trajectory[-1][-1] - trajectory[-2][-1]) < 0 else -1]
             # Newest detected point
@@ -72,11 +78,11 @@ while True:
                 
                 for c,v in cluster_indices.items():
                     c_center = np.mean(latest_coords[labels == c], axis = 0)
-                    print(sum([vect_dir[index][0] for index in cluster_indices[c] if index in vect_dir]))
-                    print([vect_dir[index][0] for index in cluster_indices[c] if index in vect_dir])
-                    print(c_center[1])
-                    print("--")
-                    if c_center[1] > 480 + 50 or c_center[1] < 480 - 50 and c_center > 180:
+                    #print(sum([vect_dir[index][0] for index in cluster_indices[c] if index in vect_dir]))
+                    #print([vect_dir[index][0] for index in cluster_indices[c] if index in vect_dir])
+                    #print(c_center[1])
+                    #print("--")
+                    if c_center[1] > 480 + 50 or c_center[1] < 480 - 50 and c_center[0] > 180:
                         continue
                     if sum([vect_dir[index][0] for index in cluster_indices[c] if index in vect_dir]) > 0:
                         cars_up += 1
@@ -129,10 +135,13 @@ while True:
     cv2.putText(img, f"PUJA: {cars_up}", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.putText(img, f"BAIXA: {cars_down}", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('OpF', img)
+    frame_resized = cv2.resize(img, (450, 600))
+    #result.write(frame_resized)
     #cv2.imshow('Mask', mask)
 
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
+#result.release()
 cap.release()
 cv2.destroyAllWindows()
