@@ -2,14 +2,14 @@ import cv2
 import numpy as np
 
 # Obrir video
-cap = cv2.VideoCapture(r'car_tracker\videos\short.mp4')
+cap = cv2.VideoCapture(r'car_tracker\videos\shadow.mp4')
 
 # Inicialitzem el substractor
 fgbg = cv2.createBackgroundSubtractorMOG2()
 
 # Definim parametres i variables
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)) 
-min_contour_area = 2000
+min_contour_area = 3000
 cars = {}
 cars_timeouts = {}
 vect_dir = {}
@@ -84,7 +84,7 @@ while True:
                 cars_timeouts[closest_car_id] = 0 # Fem reset si encara es detecta el cotxe
                 vect_dir[closest_car_id].append(1 if (new_cars[closest_car_id]['centroid'][1] - aux) < 0 else -1)
             else: # en cas contrari creem nou cotxe
-                if cx > 200 and (cy > 530 or cy < 430):
+                if cx > 200 and (cy > 550 or cy < 430):
                     new_car_id = car_id_counter + 1
                     car_id_counter += 1
                     new_cars[new_car_id] = {'centroid': (cx, cy)}
@@ -92,7 +92,7 @@ while True:
                     vect_dir[new_car_id] = []
             
             #print(int(cy))
-            if int(cy) in [i for i in range(530, 545)]:
+            if int(cy) in [i for i in range(550, 565)]:
                 if closest_car_id is not None:
                     if sum(vect_dir[closest_car_id][int(len(vect_dir[closest_car_id])/1.3):]) > 0:
                         if car_directions[closest_car_id] == "down":
@@ -125,7 +125,7 @@ while True:
 
     cars = new_cars.copy()
 
-    cv2.circle(frame, (150, 530), 8, (255, 255, 0), -1)
+    cv2.circle(frame, (150, 550), 8, (255, 255, 0), -1)
     for car_id, car_info in cars.items():
         cx, cy = car_info['centroid']
         cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)

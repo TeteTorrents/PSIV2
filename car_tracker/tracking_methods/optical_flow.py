@@ -22,10 +22,10 @@ can_execute = True
 aux_frame = 0
 
 # To write result
-#size = (450, 600) 
-#result = cv2.VideoWriter('car_tracker/tracking_methods/sols/opf.avi',  
-#                         cv2.VideoWriter_fourcc(*'MJPG'), 
-#                         10, size) 
+size = (450, 600) 
+result = cv2.VideoWriter('car_tracker/tracking_methods/sols/opf.avi',  
+                         cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size) 
 
 
 while True:
@@ -136,12 +136,12 @@ while True:
     cv2.putText(img, f"BAIXA: {cars_down}", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('OpF', img)
     frame_resized = cv2.resize(img, (450, 600))
-    #result.write(frame_resized)
+    result.write(frame_resized)
     #cv2.imshow('Mask', mask)
 
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
-#result.release()
+result.release()
 cap.release()
 cv2.destroyAllWindows()

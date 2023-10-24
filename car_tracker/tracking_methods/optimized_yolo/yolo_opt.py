@@ -46,7 +46,7 @@ while True:
     px=pd.DataFrame(stacked_data).astype("float")
     px['section'] = ['l' for i in range(len(l))] + ['u' for i in range(len(u))]
     list=[]
-             
+
     for index,row in px.iterrows():
         
         if row['section'] == 'l':

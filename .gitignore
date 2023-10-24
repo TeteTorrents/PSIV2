@@ -15,6 +15,7 @@ matricules/__pycache__/
 *.gif
 *.bmp
 *.mp4
+*.avi
 
 # Yolo ignores
 matricules/models/YoloV8/*

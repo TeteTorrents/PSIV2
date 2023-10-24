@@ -56,8 +56,8 @@ class Tracker:
         x = [coord[0] for coord in coords]
         y = [coord[1] for coord in coords]
 
-        direction = "up" if y[-1] < y[-3] else "down"
-        velocity = (y[-1] - y[-3]) / 2
+        direction = "up" if y[-1] < y[0] else "down"
+        velocity = (y[-1] - y[-3]) / len(y)-1
 
         if direction == "up":
             predicted_x = x[-1]
