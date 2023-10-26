@@ -1,65 +1,58 @@
 import cv2
+import torch
+from tracker import *
 import numpy as np
-from google.colab.patches import cv2_imshow
-from YOLOV5 import yolov5
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
-# Inicialitzar el model YOLOv5
-model = yolov5.Model('yolov5s')  
+cap=cv2.VideoCapture(r'car_tracker\videos\shadow.mp4')
 
-# Inicialitzar comptadors i diccionaris per al tracking
-car_count = 0
-tracked_cars = {}
 
-# Funció per a calcular la distància euclidiana entre dos punts
-def distancia_euclidiana(punt1, punt2):
-    return np.sqrt((punt1[0] - punt2[0])**2 + (punt1[1] - punt2[1])**2)
+def POINTS(event, x, y, flags, param):
+    if event == cv2.EVENT_MOUSEMOVE :  
+        colorsBGR = [x, y]
+        print(colorsBGR)
+        
 
-# Funció per a fer el tracking dels cotxes
-def trackejar_cotxes(frame):
-    global car_count
-    results = model(frame)  # Detectar objectes al frame
+cv2.namedWindow('FRAME')
+cv2.setMouseCallback('FRAME', POINTS)
 
-    # Iterar sobre els resultats de la detecció
-    for det in results.xyxy[0].cpu().numpy():
-        if det[4] > 0.3 and det[5] == 2:  # Filtrar deteccions de cotxes amb confiança > 0.3
-            centre = ((det[0] + det[2]) / 2, (det[1] + det[3]) / 2)  # Calcular el centre del bounding box
+# To write result
+size = (450, 600) 
+result = cv2.VideoWriter('car_tracker/tracking_methods/sols/yolov5modshadow.avi',  
+                         cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size) 
 
-            # Buscar cotxes propers i verificar el moviment a l'eix Y
-            for car_id, tracked_car in tracked_cars.items():
-                dist = distancia_euclidiana(centre, tracked_car['darrer_centre'])
-                if dist < 50 and abs(centre[1] - tracked_car['darrer_centre'][1]) > 5:
-                    if car_id not in tracked_car['ids_comptats']:
-                        tracked_car['ids_comptats'].append(car_id)
-                        if centre[1] > tracked_car['darrer_centre'][1]:
-                            car_count += 1  # Cotxe pujant
-                        else:
-                            car_count -= 1  # Cotxe baixant
 
-            # Afegir un nou cotxe al tracking
-            tracked_cars[car_count] = {'darrer_centre': centre, 'ids_comptats': []}
-
-            # Dibuixar el bounding box i l'ID del cotxe
-            frame = cv2.rectangle(frame, (int(det[0]), int(det[1])), (int(det[2]), int(det[3])), (0, 255, 0), 2)
-            frame = cv2.putText(frame, str(car_count), (int(centre[0]), int(centre[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-
-    return frame
-
-# Processar un vídeo o frames individuals
-cap = cv2.VideoCapture('/content/output7.mp4') 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
+tracker = Tracker()
+while True:
+    ret,frame=cap.read()
+    frame=cv2.resize(frame,(450,600))
+    cv2.circle(frame, (140, 315), 4, (255, 255, 0), -1)
+    results = model(frame)
+    #frame = np.squeeze(results.render())
+    list_res = []
+    for idx,s in results.pandas().xyxy[0].iterrows():
+        if (s['name'] == 'car' or s['name'] == 'truck' or s['name'] == 'bus') and s['confidence'] > 0.55:
+            x1 = int(s['xmin'])
+            y1 = int(s['ymin'])
+            x2 = int(s['xmax'])
+            y2 = int(s['ymax'])
+            nom = str(s['name'])
+            list_res.append([x1,y1,x2,y2])
+            #cv2.rectangle(frame, (x1,y1), (x2,y2), (255,0,255), 2)
+            #cv2.putText(frame,nom,(x1,y1),cv2.FONT_HERSHEY_COMPLEX,0.5,(0,255,255),1)
+    boxes_ids = tracker.update(list_res)
+    for box_id in boxes_ids:
+        x,y,w,h,id = box_id
+        cv2.rectangle(frame, (x,y), (w,h), (255,0,255), 2)
+        cv2.putText(frame, str(id), (x,y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,255,255), 1)
+    cv2.putText(frame, f"PUJA: {tracker.up}", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.putText(frame, f"BAIXA: {tracker.down}", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.imshow('FRAME',frame)
+    result.write(frame)
+    if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
-    # Aplicar el tracking
-    tracked_frame = trackejar_cotxes(frame)
-
-    cv2_imshow(tracked_frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
+result.release()
 cap.release()
 cv2.destroyAllWindows()
-
-# Imprimir el total de cotxes comptats
-print(f'Total de cotxes comptats: {car_count}')
