@@ -70,8 +70,8 @@ class Tracker:
     def self_update(self, id):
         print("YOP")
         coords = self.center_points[id]
-        x = [coord[0] for coord in coords]
-        y = [coord[1] for coord in coords]
+        x = [coord[0] for coord in coords][-15:]
+        y = [coord[1] for coord in coords][-15:]
 
         direction = "up" if y[-1] < y[0] else "down"
         kf = KalmanFilter()
@@ -81,7 +81,7 @@ class Tracker:
         pred_final = kf.predict(pred[0], pred[1])
         
         if abs(pred_final[1] - y[-1]) > 4:
-            pred_final = (pred_final[0], y[-1]-3)
+            pred_final = (pred_final[0], y[-1]-1)
 
         if abs(pred_final[0] - x[-1]) >= 2:
             pred_final = (x[-1], pred_final[1])
