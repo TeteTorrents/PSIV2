@@ -23,7 +23,7 @@ class Tracker:
                     pt = ptl[-1]
                     dist = math.hypot(cx - pt[0], cy - pt[1])
 
-                    if dist < 100 and len(self.center_points[id]) < 3:
+                    if dist < 100 and len(self.center_points[id]) < 3: # < 3 UwU
                         self.center_points[id].append((cx, cy))
                         self.whdict[id] = (w, h)
                         objects_bbs_ids.append([x, y, w, h, id])
@@ -57,7 +57,7 @@ class Tracker:
         y = [coord[1] for coord in coords]
 
         direction = "up" if y[-1] < y[0] else "down"
-        velocity = (y[-1] - y[-3]) / len(y)-1
+        velocity = (y[-1] - y[-3]) / 2 # len(y) - 1
 
         if direction == "up":
             predicted_x = x[-1]
@@ -71,7 +71,7 @@ class Tracker:
         if (predicted_y == 223 and direction == 'up') or (predicted_y == 509 or direction == 'down'):
             del self.center_points[id]
         
-        if int(predicted_y) in [i for i in range(420, 435)] and id not in self.counted_id:
+        if int(predicted_y) in [i for i in range(250, 435)] and id not in self.counted_id:
             if direction == 'up':
                 self.up += 1
             else:
