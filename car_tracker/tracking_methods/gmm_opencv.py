@@ -9,7 +9,7 @@ fgbg = cv2.createBackgroundSubtractorMOG2()
 
 # Definim parametres i variables
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)) 
-min_contour_area = 3000
+min_contour_area = 2500
 cars = {}
 cars_timeouts = {}
 vect_dir = {}
@@ -17,6 +17,7 @@ car_directions = {}
 car_id_counter = 0
 delay_frame = 75
 frame_count = {}
+frame_idx = 0
 car_timeout_threshold = 100
 cars_up, cars_down = 0, 0
 
@@ -136,11 +137,11 @@ while True:
     frame_resized = cv2.resize(frame, (450, 600))
     vc_resized = cv2.resize(value_channel, (450, 600))
     mask_resized = cv2.resize(mask, (450, 600))
+    print(frame_idx)
+    frame_idx += 1
     cv2.imshow('frame', frame_resized)
-    cv2.imshow('vc', vc_resized)
-    cv2.imshow('mask', mask_resized)
     #result.write(frame_resized)
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 #result.release()

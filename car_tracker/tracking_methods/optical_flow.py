@@ -4,7 +4,7 @@ from sklearn.cluster import DBSCAN
 from collections import defaultdict
 
 # Obrir video
-cap = cv2.VideoCapture(r'car_tracker\videos\short.mp4')
+cap = cv2.VideoCapture(r'car_tracker\videos\shadow.mp4')
 
 # Parametres pel Lucas-Kanade Optical Flow
 lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
@@ -139,9 +139,9 @@ while True:
     frame_resized = cv2.resize(img, (450, 600))
     mask_resized = cv2.resize(mask, (450, 600))
     cv2.imshow('OpF', frame_resized)
-    cv2.imshow('OpFMask', mask_resized)
+    #cv2.imshow('OpFMask', mask_resized)
     #result.write(frame_resized)
-    print(frame_idx)
+    #print(frame_idx)
     #cv2.imshow('Mask', mask)
 
     if cv2.waitKey(10) & 0xFF == ord('q'):

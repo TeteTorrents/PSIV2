@@ -10,10 +10,15 @@ def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
         colorsBGR = [x, y]
         print(colorsBGR)
-        
+
+size = (450, 600) 
+result = cv2.VideoWriter('car_tracker/tracking_methods/sols/yolo_opt_video.avi',  
+                         cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size) 
+
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
-cap=cv2.VideoCapture('car_tracker/videos/short.mp4')
+cap=cv2.VideoCapture('car_tracker/videos/shadow.mp4')
 
 my_file = open("car_tracker/tracking_methods/optimized_yolo_kf/coco.txt", "r")
 data = my_file.read()
@@ -81,8 +86,10 @@ while True:
     cv2.putText(frame, f"PUJA: {tracker.up}", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.putText(frame, f"BAIXA: {tracker.down}", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow("RGB", frame)
+    result.write(frame)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
+result.release()
 cap.release()
 cv2.destroyAllWindows()
