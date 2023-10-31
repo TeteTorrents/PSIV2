@@ -1,0 +1,5 @@
+YOLOv8_long = https://mega.nz/file/8U0hTaSJ#bDloGnCJYceOE2xftCV45FP9ctNW2fIGK2MFA-855Dk
+
+YOLOv8_long_2 = https://mega.nz/file/RMMlQQxY#CBO6BPVlFHxwztoNeFDY161QCWARnwg9RhkCfPEiz4o
+
+Shadow = https://mega.nz/file/QJ0w1ZaS#nIb1nrGOBfQkgRhzHOhHY45n8eTBkNQvAAAAAAAAAAA
