@@ -12,7 +12,7 @@ def RGB(event, x, y, flags, param):
         print(colorsBGR)
 
 size = (450, 600) 
-result = cv2.VideoWriter('car_tracker/tracking_methods/sols/yolo_opt_video.avi',  
+result = cv2.VideoWriter('car_tracker/tracking_methods/sols/yolo_opt_video_shadow.avi',  
                          cv2.VideoWriter_fourcc(*'MJPG'), 
                          10, size) 
 
